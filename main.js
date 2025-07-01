@@ -64,7 +64,13 @@ async function showInputNumber() {
       {
         name: "exchange",
         type: "number",
-        message: `===== Convierte tu moneda ==> :`
+        message: `===== Convierte tu moneda ==> :`,
+        validate: (value) => {
+          if (isNaN(value) || value <= 0) {
+            return "Ingresa un número mayor a cero";
+          }
+          return true;
+      }
       }
     ]
   )

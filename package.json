@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "run": "node main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node main.js",
+    "test": "vitest"
   },
   "keywords": [],
   "author": "Juan Diaz",
@@ -14,5 +14,8 @@
   "dependencies": {
     "dotenv": "^17.0.0",
     "inquirer": "^12.6.3"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
   }
 }

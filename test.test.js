@@ -39,7 +39,7 @@ describe('convert', () => {
 
 it('lanza error si no existe la tasa de cambio', async () => {
   const latestExchange = new Map();
-  latestExchange.set('USD', { date: '2024-01-15' }); // No hay EUR
+  latestExchange.set('USD', { date: '2024-01-15' }); 
   const exchangeHistory = [];
   const amount = 10;
   const baseCurrency = 'USD';

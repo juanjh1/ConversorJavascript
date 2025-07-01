@@ -1,10 +1,17 @@
+// external modules 
 import inquirer from "inquirer";
+import dotenv from "dotenv";
+
+// my modules
+import { loadCurrencies } from "./api-loaders.js";
+import { convert, validateStatusOfExchange } from "./utils.js"
 
 
+dotenv.config();
 const currencies = new Map();
 const latestExchange = new Map();
 const exchangeHistory = new Array();
-const apiKey = "fca_live_Ct54Yyv3XvnLNAcPdDdVWxy7NTOetOUXk5MwwEca"
+const apiKey = process.env.API_KEY;
 const seed = "http://api.freecurrencyapi.com/v1/"
 
 let baseCurrency = "USD";
@@ -22,87 +29,7 @@ const mainMenuHash = {
 
 
 
-async function loadCurrencies() {
-  // this function load all of currencies of the api
-  // I try to call this function just one time
-  const endPoint = "currencies"
-  let res = await fetch(`${seed}${endPoint}?apikey=${apiKey}`);
-  let json = await res.json();
-  for (const element of Object.keys(json.data)) {
-    const { code, name, symbol, decimal_digits } = json.data[element];
-    const reductedCurrency = { code, name, symbol, decimal_digits }
-    currencies.set(element, reductedCurrency)
-  }
-}
-
-
-async function loadExchanges() {
-  let endPoint = "latest"
-  let res;
-  try {
-    res = await fetch(`${seed}${endPoint}?apikey=${apiKey}&base_currency=${baseCurrency}`);
-
-  } catch (error) {
-    console.log(`Hubo un error ${error}`)
-    return;
-  }
-  let json = await res.json();
-  let date = new Date()
-  json.data["date"] = getDateLikeString(date)
-  latestExchange.set(baseCurrency, json.data);
-}
-
-
 // utils 
-const getDateLikeString = (date) => {
-  return date.toISOString().split("T")[0]
-}
-
-
-
-const validateStatusOfExchange = async () => {
-  if (!latestExchange.has(baseCurrency)) {
-    await loadExchanges()
-    return;
-  }
-  let date = new Date()
-  let latestExchangeOfCurrececy = latestExchange.get(baseCurrency)
-  if (latestExchangeOfCurrececy.date !== getDateLikeString(date)) {
-    await loadExchanges()
-  }
-}
-
-
-const convert = async (amount, baseCurrency, targetCurrency) =>{
-  await validateStatusOfExchange();
-
-  const rates = latestExchange.get(baseCurrency);
-  if (!rates) {
-    throw new Error(`No se encontraron tasas para la moneda base: ${baseCurrency}`);
-  }
-
-  const exchangeRate = rates[targetCurrency];
-  if (!exchangeRate) {
-    throw new Error(`No se encontró tasa de cambio de ${baseCurrency} a ${targetCurrency}`);
-  }
-
-  let total = amount * exchangeRate;
-
-  exchangeHistory.push(createHisotoryImboun(amount, baseCurrency, targetCurrency, exchangeRate, total)); 
-  return total;
-}
-
-
-const createHisotoryImboun = (amount, baseCurrency, targetCurrency, exchangeRate , total) =>{
-
-    return {amount: amount, 
-            baseCurrency: baseCurrency, 
-            targetCurrency: targetCurrency, 
-            exchangeRate:exchangeRate,
-            date: new Date(),
-            total: total}
-}
-
 async function showHistory() {
   if (exchangeHistory.length === 0) {
     console.log("No hay conversiones en esta sesión.");
@@ -122,7 +49,7 @@ async function showHistory() {
 async function showCurrencies() {
   // this function
   if (currencies.size === 0) {
-    await loadCurrencies()
+    await loadCurrencies(seed, apiKey, currencies)
   }
   for (const [_, currency] of currencies) {
     console.log(`  ==> ${currency.code} - ${currency.name} - ${currency.symbol}`)
@@ -132,26 +59,32 @@ async function showCurrencies() {
 
 
 async function showInputNumber() {
-  let amount= await inquirer.prompt(
+  let amount = await inquirer.prompt(
     [
       {
         name: "exchange",
         type: "number",
-        message: `===== Convierte tu moneda ==> :`,
-        choices: Array.from(currencies.keys())
+        message: `===== Convierte tu moneda ==> :`
       }
     ]
   )
 
-  let newAmount = await convert(amount.exchange, baseCurrency, targetCurrency);
+  let newAmount = await convert(
+    amount.exchange,
+    baseCurrency,
+    targetCurrency,
+    latestExchange,
+    exchangeHistory,
+    seed,
+    apiKey
+  );
   console.log(`  ==> ${amount.exchange} ${baseCurrency} = ${newAmount.toFixed(2)} ${targetCurrency}`);
 }
 
 
 async function showExchangeRates() {
-
   if (currencies.size === 0) {
-    await loadCurrencies()
+    await loadCurrencies(seed, apiKey, currencies)
   }
 
   let selectedCurrencies = await inquirer.prompt(
@@ -164,7 +97,7 @@ async function showExchangeRates() {
       }
     ]
   )
-  await validateStatusOfExchange();
+  await validateStatusOfExchange(latestExchange, baseCurrency, seed, apiKey);
   const data = latestExchange.get(baseCurrency);
   // separator 
   console.log()
@@ -179,7 +112,7 @@ async function showExchangeRates() {
 async function showSelect(string) {
 
   if (currencies.size === 0) {
-    await loadCurrencies()
+    await loadCurrencies(seed, apiKey, currencies)
   }
 
   let currencySelected = await inquirer.prompt(
@@ -202,8 +135,6 @@ async function displaySelectMenus() {
   baseCurrency = originCurrency;
   targetCurrency = destinationCurrency;
 }
-
-
 
 
 async function showMenu() {

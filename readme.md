@@ -24,8 +24,11 @@ Gracias a Inquirer, el usuario puede navegar por las opciones del menú, selecci
    git clone https://github.com/juanjh1/ConversorJavascript.git
    cd ConversorJavascript
    ```
-
-2. Instala las dependencias:
+2. Crear archivo .env
+   ```sh
+   API_KEY=tu api
+   ```
+3. Instala las dependencias:
    ```sh
    npm install
    ```

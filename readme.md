@@ -22,7 +22,7 @@ Gracias a Inquirer, el usuario puede navegar por las opciones del menú, selecci
 1. Clona este repositorio:
    ```sh
    git clone https://github.com/juanjh1/ConversorJavascript.git
-   cd monedas_prueba_tecnica
+   cd ConversorJavascript
    ```
 
 2. Instala las dependencias:
@@ -84,6 +84,18 @@ Ejecuta el programa con:
 npm run start
 ```
 
+Correr los test:
+
+```sh
+npm run test
+```
+
+Correr el linter:
+
+```sh
+npm run lint
+```
+
 Sigue las instrucciones en pantalla para seleccionar opciones y realizar conversiones.
 
 ## Tecnologías utilizadas
@@ -114,8 +126,7 @@ Esto reduce la cantidad de solicitudes, mejora la velocidad de respuesta de la a
 
 ---
 
-**Autor:**  
-Juan Diaz## Ejemplo de uso
+## Ejemplo de uso
 
 A continuación se muestra una captura de pantalla del conversor de monedas funcionando en la terminal.  
 Puedes ver cómo se listan las monedas, se seleccionan tasas de cambio, se realiza una conversión y se muestra el historial de conversiones, todo de manera interactiva y clara gracias a la interfaz CLI:
@@ -141,5 +152,6 @@ En el código, solo se consulta la API cuando es estrictamente necesario (por ej
 
 ---
 
+
 **Autor:**  
-Juan diaz
+- `Juan Diaz`

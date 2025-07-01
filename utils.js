@@ -56,4 +56,8 @@ export const validateStatusOfExchange = async (latestExchange, baseCurrency, see
 
 
 
-
+export function syncSeparator (functionToEx){
+  console.log()
+  functionToEx()
+  console.log()
+}

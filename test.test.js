@@ -36,3 +36,28 @@ describe('convert', () => {
     expect(exchangeHistory[0].targetCurrency).toBe('EUR');
   });
 });
+
+it('lanza error si no existe la tasa de cambio', async () => {
+  const latestExchange = new Map();
+  latestExchange.set('USD', { date: '2024-01-15' }); // No hay EUR
+  const exchangeHistory = [];
+  const amount = 10;
+  const baseCurrency = 'USD';
+  const targetCurrency = 'EUR';
+  const seed = '';
+  const apiKey = '';
+
+  globalThis.validateStatusOfExchange = vi.fn();
+
+  await expect(
+    convert(
+      amount,
+      baseCurrency,
+      targetCurrency,
+      latestExchange,
+      exchangeHistory,
+      seed,
+      apiKey
+    )
+  ).rejects.toThrow('No se encontró tasa de cambio de USD a EUR');
+});

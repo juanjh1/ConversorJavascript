@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 
 // my modules
 import { loadCurrencies } from "./api-loaders.js";
-import { convert, validateStatusOfExchange } from "./utils.js"
+import { convert, validateStatusOfExchange, syncSeparator } from "./utils.js"
 
 
 dotenv.config();
@@ -36,11 +36,17 @@ async function showHistory() {
     return;
   }
 
-  exchangeHistory.forEach((entry, index) => {
-    console.log(
-      `${index + 1}. ${entry.amount} ${entry.baseCurrency} -> ${entry.total.toFixed(2)} ${entry.targetCurrency} @ ${entry.exchangeRate} (${entry.date.toLocaleString()})`
-    );
-  });
+  syncSeparator(
+    () => {
+      exchangeHistory.forEach((entry, index) => {
+        console.log(
+          `${index + 1}. ${entry.amount} ${entry.baseCurrency} -> ${entry.total.toFixed(2)} ${entry.targetCurrency} @ ${entry.exchangeRate} (${entry.date.toLocaleString()})`
+        );
+      });
+    }
+  )
+
+
 }
 
 
@@ -51,9 +57,12 @@ async function showCurrencies() {
   if (currencies.size === 0) {
     await loadCurrencies(seed, apiKey, currencies)
   }
-  for (const [_, currency] of currencies) {
-    console.log(`  ==> ${currency.code} - ${currency.name} - ${currency.symbol}`)
-  }
+
+  syncSeparator(() => {
+    for (const [, currency] of currencies) {
+      console.log(`  ==> ${currency.code} - ${currency.name} - ${currency.symbol}`)
+    }
+  })
 
 }
 
@@ -70,7 +79,7 @@ async function showInputNumber() {
             return "Ingresa un número mayor a cero";
           }
           return true;
-      }
+        }
       }
     ]
   )
@@ -84,7 +93,10 @@ async function showInputNumber() {
     seed,
     apiKey
   );
-  console.log(`  ==> ${amount.exchange} ${baseCurrency} = ${newAmount.toFixed(2)} ${targetCurrency}`);
+  syncSeparator(() => {
+    console.log(`  ==> ${amount.exchange} ${baseCurrency} = ${newAmount.toFixed(2)} ${targetCurrency}`);
+  })
+
 }
 
 
@@ -105,13 +117,13 @@ async function showExchangeRates() {
   )
   await validateStatusOfExchange(latestExchange, baseCurrency, seed, apiKey);
   const data = latestExchange.get(baseCurrency);
-  // separator 
-  console.log()
-  selectedCurrencies.showExchangeRate.forEach(element => {
-    console.log(`  ==> 1 ${baseCurrency} = ${element} ${data[element].toFixed(2)}`)
-  });
-  // separator 
-  console.log()
+
+  syncSeparator(() => {
+    selectedCurrencies.showExchangeRate.forEach(element => {
+      console.log(`  ==> 1 ${baseCurrency} = ${element} ${data[element].toFixed(2)}`)
+    });
+  })
+
 }
 
 
